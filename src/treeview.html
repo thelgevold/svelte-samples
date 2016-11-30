@@ -1,0 +1,37 @@
+<div>
+  <ul>
+  {{#each locations as loc1}}
+    <li>
+      {{loc1.name}}
+      <ul>
+      {{#each loc1.locations as loc2}}
+        <li>
+          {{loc2.name}}
+          <ul>
+          {{#each loc2.locations as loc3}}
+            <li>{{loc3.name}}</li>
+          {{/each}}
+          </ul>
+        </li>
+      {{/each}}
+      </ul>
+    </li>
+  {{/each}}
+  </ul>
+</div>
+
+<script>
+
+  import { LocationService } from './location-service';
+  let locationService = new LocationService();
+  let locations = locationService.getLocations();
+  
+  export default {
+    data () {
+      return {
+        locations: locations
+      };
+    }
+  };
+
+</script>
