@@ -5,7 +5,7 @@
   "author": "Torgeir Helgevold",
   "license": "MIT",
   "scripts": {
-    "build": "svelte compile ./src/treeview.html > ./src/treeview.js && rollup -c rollup-config.js",
+    "build": "svelte compile ./src/app.html > ./src/app.js && rollup -c rollup-config.js",
     "start": "lite-server"
   },
   "devDependencies": {

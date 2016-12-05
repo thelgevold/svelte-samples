@@ -1,5 +1,5 @@
-import treeview from './treeview';
+import app from './app';
 
-var app = new treeview({
+var demoApp = new app({
   target: document.querySelector( 'main' )
 });
