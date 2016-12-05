@@ -201,12 +201,8 @@ function renderEachBlock_1 ( root, eachBlock_1_value, row, row__index, component
 function renderEachBlock_0 ( root, eachBlock_0_value, col, col__index, component, target ) {
 	var td = document.createElement( 'td' );
 	
-	var a = document.createElement( 'a' );
-	
 	var text = document.createTextNode( col.descr );
-	a.appendChild( text );
-	
-	td.appendChild( a )
+	td.appendChild( text );
 	
 	target.appendChild( td )
 
@@ -219,8 +215,6 @@ function renderEachBlock_0 ( root, eachBlock_0_value, col, col__index, component
 
 		teardown: function ( detach ) {
 			if ( detach ) td.parentNode.removeChild( td );
-			
-			
 		}
 	};
 }
