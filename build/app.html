@@ -6,7 +6,7 @@ var template = (function () {
   return {
     data () {
       return {
-        title: 'Svelte Demo Components'
+        title: 'Demo Page'
       }
     },
 
@@ -33,33 +33,33 @@ function renderMainFragment ( root, component, target ) {
 	
 	var h4 = document.createElement( 'h4' );
 	
-	var text2 = document.createTextNode( "Grid" );
+	var text2 = document.createTextNode( "Treeview" );
 	h4.appendChild( text2 );
 	
 	div.appendChild( h4 )
 	
-	var text3 = document.createTextNode( "\n   " );
+	var text3 = document.createTextNode( "\n  " );
 	div.appendChild( text3 );
 	
-	var grid = new template.components.grid({
+	var treeview = new template.components.treeview({
 		target: div,
 		parent: component
 	});
 	
-	var text4 = document.createTextNode( "\n\n  " );
+	var text4 = document.createTextNode( "\n\n   " );
 	div.appendChild( text4 );
 	
 	var h41 = document.createElement( 'h4' );
 	
-	var text5 = document.createTextNode( "Treeview" );
+	var text5 = document.createTextNode( "Grid" );
 	h41.appendChild( text5 );
 	
 	div.appendChild( h41 )
 	
-	var text6 = document.createTextNode( "\n  " );
+	var text6 = document.createTextNode( "\n   " );
 	div.appendChild( text6 );
 	
-	var treeview = new template.components.treeview({
+	var grid = new template.components.grid({
 		target: div,
 		parent: component
 	});
@@ -84,7 +84,7 @@ function renderMainFragment ( root, component, target ) {
 			
 			text3.parentNode.removeChild( text3 );
 			
-			grid.teardown( false );
+			treeview.teardown( false );
 			
 			text4.parentNode.removeChild( text4 );
 			
@@ -94,7 +94,7 @@ function renderMainFragment ( root, component, target ) {
 			
 			text6.parentNode.removeChild( text6 );
 			
-			treeview.teardown( false );
+			grid.teardown( false );
 		}
 	};
 }

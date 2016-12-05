@@ -5,7 +5,7 @@
   "author": "Torgeir Helgevold",
   "license": "MIT",
   "scripts": {
-    "build": "svelte compile ./src/app.html > ./src/app.js && rollup -c rollup-config.js",
+    "build": "./build.sh && rollup -c rollup-config.js",
     "start": "lite-server"
   },
   "devDependencies": {
@@ -14,5 +14,8 @@
     "rollup": "^0.36.0",
     "rollup-plugin-closure-compiler-js": "^1.0.2",
     "rollup-plugin-uglify": "^1.0.1"
+  },
+  "dependencies": {
+    "bootstrap": "^3.3.7"
   }
 }

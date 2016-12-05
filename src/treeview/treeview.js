@@ -71,10 +71,10 @@ function renderMainFragment ( root, component, target ) {
 	};
 }
 
-function renderEachBlock_0 ( root, eachBlock_0_value, country, country__index, component, target ) {
+function renderEachBlock_0 ( root, eachBlock_0_value, loc1, loc1__index, component, target ) {
 	var li = document.createElement( 'li' );
 	
-	var text = document.createTextNode( country.name );
+	var text = document.createTextNode( loc1.name );
 	li.appendChild( text );
 	
 	var text1 = document.createTextNode( "\n      " );
@@ -82,15 +82,15 @@ function renderEachBlock_0 ( root, eachBlock_0_value, country, country__index, c
 	
 	var ul = document.createElement( 'ul' );
 	
-	var eachBlock_1_anchor = document.createComment( "#each country.locations" );
+	var eachBlock_1_anchor = document.createComment( "#each loc1.locations" );
 	ul.appendChild( eachBlock_1_anchor );
 	
-	var eachBlock_1_value = country.locations;
+	var eachBlock_1_value = loc1.locations;
 	var eachBlock_1_fragment = document.createDocumentFragment();
 	var eachBlock_1_iterations = [];
 	
 	for ( var i = 0; i < eachBlock_1_value.length; i += 1 ) {
-		eachBlock_1_iterations[i] = renderEachBlock_1( root, eachBlock_0_value, country, country__index, eachBlock_1_value, eachBlock_1_value[i], i, component, eachBlock_1_fragment );
+		eachBlock_1_iterations[i] = renderEachBlock_1( root, eachBlock_0_value, loc1, loc1__index, eachBlock_1_value, eachBlock_1_value[i], i, component, eachBlock_1_fragment );
 	}
 	
 	eachBlock_1_anchor.parentNode.insertBefore( eachBlock_1_fragment, eachBlock_1_anchor );
@@ -100,18 +100,18 @@ function renderEachBlock_0 ( root, eachBlock_0_value, country, country__index, c
 	target.appendChild( li )
 
 	return {
-		update: function ( changed, root, eachBlock_0_value, country, country__index ) {
-			var country = eachBlock_0_value[country__index];
+		update: function ( changed, root, eachBlock_0_value, loc1, loc1__index ) {
+			var loc1 = eachBlock_0_value[loc1__index];
 			
-			text.data = country.name;
+			text.data = loc1.name;
 			
-			var eachBlock_1_value = country.locations;
+			var eachBlock_1_value = loc1.locations;
 			
 			for ( var i = 0; i < eachBlock_1_value.length; i += 1 ) {
 				if ( !eachBlock_1_iterations[i] ) {
-					eachBlock_1_iterations[i] = renderEachBlock_1( root, eachBlock_0_value, country, country__index, eachBlock_1_value, eachBlock_1_value[i], i, component, eachBlock_1_fragment );
+					eachBlock_1_iterations[i] = renderEachBlock_1( root, eachBlock_0_value, loc1, loc1__index, eachBlock_1_value, eachBlock_1_value[i], i, component, eachBlock_1_fragment );
 				} else {
-					eachBlock_1_iterations[i].update( changed, root, eachBlock_0_value, country, country__index, eachBlock_1_value, eachBlock_1_value[i], i );
+					eachBlock_1_iterations[i].update( changed, root, eachBlock_0_value, loc1, loc1__index, eachBlock_1_value, eachBlock_1_value[i], i );
 				}
 			}
 			
@@ -139,7 +139,7 @@ function renderEachBlock_0 ( root, eachBlock_0_value, country, country__index, c
 	};
 }
 
-function renderEachBlock_1 ( root, eachBlock_0_value, country, country__index, eachBlock_1_value, loc2, loc2__index, component, target ) {
+function renderEachBlock_1 ( root, eachBlock_0_value, loc1, loc1__index, eachBlock_1_value, loc2, loc2__index, component, target ) {
 	var li = document.createElement( 'li' );
 	
 	var text = document.createTextNode( loc2.name );
@@ -158,7 +158,7 @@ function renderEachBlock_1 ( root, eachBlock_0_value, country, country__index, e
 	var eachBlock_2_iterations = [];
 	
 	for ( var i = 0; i < eachBlock_2_value.length; i += 1 ) {
-		eachBlock_2_iterations[i] = renderEachBlock_2( root, eachBlock_0_value, country, country__index, eachBlock_1_value, loc2, loc2__index, eachBlock_2_value, eachBlock_2_value[i], i, component, eachBlock_2_fragment );
+		eachBlock_2_iterations[i] = renderEachBlock_2( root, eachBlock_0_value, loc1, loc1__index, eachBlock_1_value, loc2, loc2__index, eachBlock_2_value, eachBlock_2_value[i], i, component, eachBlock_2_fragment );
 	}
 	
 	eachBlock_2_anchor.parentNode.insertBefore( eachBlock_2_fragment, eachBlock_2_anchor );
@@ -168,8 +168,8 @@ function renderEachBlock_1 ( root, eachBlock_0_value, country, country__index, e
 	target.appendChild( li )
 
 	return {
-		update: function ( changed, root, eachBlock_0_value, country, country__index, eachBlock_1_value, loc2, loc2__index ) {
-			var country = eachBlock_0_value[country__index];
+		update: function ( changed, root, eachBlock_0_value, loc1, loc1__index, eachBlock_1_value, loc2, loc2__index ) {
+			var loc1 = eachBlock_0_value[loc1__index];
 			var loc2 = eachBlock_1_value[loc2__index];
 			
 			text.data = loc2.name;
@@ -178,9 +178,9 @@ function renderEachBlock_1 ( root, eachBlock_0_value, country, country__index, e
 			
 			for ( var i = 0; i < eachBlock_2_value.length; i += 1 ) {
 				if ( !eachBlock_2_iterations[i] ) {
-					eachBlock_2_iterations[i] = renderEachBlock_2( root, eachBlock_0_value, country, country__index, eachBlock_1_value, loc2, loc2__index, eachBlock_2_value, eachBlock_2_value[i], i, component, eachBlock_2_fragment );
+					eachBlock_2_iterations[i] = renderEachBlock_2( root, eachBlock_0_value, loc1, loc1__index, eachBlock_1_value, loc2, loc2__index, eachBlock_2_value, eachBlock_2_value[i], i, component, eachBlock_2_fragment );
 				} else {
-					eachBlock_2_iterations[i].update( changed, root, eachBlock_0_value, country, country__index, eachBlock_1_value, loc2, loc2__index, eachBlock_2_value, eachBlock_2_value[i], i );
+					eachBlock_2_iterations[i].update( changed, root, eachBlock_0_value, loc1, loc1__index, eachBlock_1_value, loc2, loc2__index, eachBlock_2_value, eachBlock_2_value[i], i );
 				}
 			}
 			
@@ -208,7 +208,7 @@ function renderEachBlock_1 ( root, eachBlock_0_value, country, country__index, e
 	};
 }
 
-function renderEachBlock_2 ( root, eachBlock_0_value, country, country__index, eachBlock_1_value, loc2, loc2__index, eachBlock_2_value, loc3, loc3__index, component, target ) {
+function renderEachBlock_2 ( root, eachBlock_0_value, loc1, loc1__index, eachBlock_1_value, loc2, loc2__index, eachBlock_2_value, loc3, loc3__index, component, target ) {
 	var li = document.createElement( 'li' );
 	
 	var text = document.createTextNode( loc3.name );
@@ -217,8 +217,8 @@ function renderEachBlock_2 ( root, eachBlock_0_value, country, country__index, e
 	target.appendChild( li )
 
 	return {
-		update: function ( changed, root, eachBlock_0_value, country, country__index, eachBlock_1_value, loc2, loc2__index, eachBlock_2_value, loc3, loc3__index ) {
-			var country = eachBlock_0_value[country__index];
+		update: function ( changed, root, eachBlock_0_value, loc1, loc1__index, eachBlock_1_value, loc2, loc2__index, eachBlock_2_value, loc3, loc3__index ) {
+			var loc1 = eachBlock_0_value[loc1__index];
 			var loc2 = eachBlock_1_value[loc2__index];
 			var loc3 = eachBlock_2_value[loc3__index];
 			

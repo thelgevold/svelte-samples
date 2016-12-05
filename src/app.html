@@ -1,22 +1,27 @@
 <div>
   <h1>{{title}}</h1>
 
+  <h4>Grid</h4>
+   <grid></grid>
+
   <h4>Treeview</h4>
   <treeview></treeview>
 </div>
 
 <script>
   import treeview from './treeview/treeview';
+  import grid from './grid/grid';
   
   export default {
     data () {
       return {
-        title: 'Demo Page'
+        title: 'Svelte Demo Components'
       }
     },
 
     components: {
-      treeview: treeview
+      treeview: treeview,
+      grid: grid
     }
   }; 
 
