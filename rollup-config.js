@@ -1,5 +1,3 @@
-import rollup from 'rollup';
-import uglify from 'rollup-plugin-uglify';
 import closure from 'rollup-plugin-closure-compiler-js';
 
 export default {

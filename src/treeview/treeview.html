@@ -1,37 +1,12 @@
-<div>
-  <ul>
-  {{#each locations as loc1}}
+<ul>
+  {{#each locations as loc}}
     <li>
-      {{loc1.name}}
-      <ul>
-      {{#each loc1.locations as loc2}}
-        <li>
-          {{loc2.name}}
-          <ul>
-          {{#each loc2.locations as loc3}}
-            <li>{{loc3.name}}</li>
-          {{/each}}
-          </ul>
-        </li>
-      {{/each}}
-      </ul>
+      {{loc.name}}
+      <:Self locations='{{loc.locations}}' />
     </li>
   {{/each}}
-  </ul>
-</div>
-
+</ul>
 <script>
-
-  import { LocationService } from './location-service';
-  let locationService = new LocationService();
-  let locations = locationService.getLocations();
-  
-  export default {
-    data () {
-      return {
-        locations: locations
-      };
-    }
-  };
-
+ export default { 
+};
 </script>

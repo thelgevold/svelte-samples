@@ -9,11 +9,10 @@
     "start": "lite-server"
   },
   "devDependencies": {
-    "google-closure-compiler-js": "^20161024.0.0",
+    "google-closure-compiler-js": "^20170124.0.0",
     "lite-server": "^2.2.2",
-    "rollup": "^0.36.0",
-    "rollup-plugin-closure-compiler-js": "^1.0.2",
-    "rollup-plugin-uglify": "^1.0.1"
+    "rollup": "^0.41.4",
+    "rollup-plugin-closure-compiler-js": "^1.0.2"
   },
   "dependencies": {
     "bootstrap": "^3.3.7"

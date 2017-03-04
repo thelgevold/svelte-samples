@@ -1,213 +1,263 @@
-import treeview from './treeview/treeview';
-import grid from './grid/grid';
+import Treeview from './treeview/treeview';
+import Grid from './grid/grid';
+import { LocationService } from './treeview/location-service';
 
 var template = (function () {
-  
+ 
+  let locationService = new LocationService();
+  let locations = locationService.getLocations();
+
   return {
     data () {
       return {
-        title: 'Svelte Demo Components'
+        title: 'Svelte Demo Components',
+        locations: locations
       }
     },
 
     components: {
-      treeview: treeview,
-      grid: grid
+      Treeview,
+      Grid
     }
   }; 
 
 }());
 
-function renderMainFragment ( root, component, target ) {
-	var div = document.createElement( 'div' );
+function renderMainFragment ( root, component ) {
+	var div = createElement( 'div' );
 	
-	var h1 = document.createElement( 'h1' );
+	var h1 = createElement( 'h1' );
 	
-	var text = document.createTextNode( root.title );
-	h1.appendChild( text );
+	appendNode( h1, div );
+	var last_text = root.title
+	var text = createText( last_text );
+	appendNode( text, h1 );
+	appendNode( createText( "\n\n  " ), div );
 	
-	div.appendChild( h1 )
+	var h4 = createElement( 'h4' );
 	
-	var text1 = document.createTextNode( "\n\n  " );
-	div.appendChild( text1 );
+	appendNode( h4, div );
+	appendNode( createText( "Grid" ), h4 );
+	appendNode( createText( "\n   " ), div );
 	
-	var h4 = document.createElement( 'h4' );
-	
-	var text2 = document.createTextNode( "Grid" );
-	h4.appendChild( text2 );
-	
-	div.appendChild( h4 )
-	
-	var text3 = document.createTextNode( "\n   " );
-	div.appendChild( text3 );
-	
-	var grid = new template.components.grid({
+	var grid = new template.components.Grid({
 		target: div,
-		parent: component
+		_root: component._root || component
 	});
 	
-	var text4 = document.createTextNode( "\n\n  " );
-	div.appendChild( text4 );
+	appendNode( createText( "\n\n  " ), div );
 	
-	var h41 = document.createElement( 'h4' );
+	var h41 = createElement( 'h4' );
 	
-	var text5 = document.createTextNode( "Treeview" );
-	h41.appendChild( text5 );
+	appendNode( h41, div );
+	appendNode( createText( "Treeview" ), h41 );
+	appendNode( createText( "\n  " ), div );
 	
-	div.appendChild( h41 )
-	
-	var text6 = document.createTextNode( "\n  " );
-	div.appendChild( text6 );
-	
-	var treeview = new template.components.treeview({
+	var treeview_initialData = {
+		locations: root.locations
+	};
+	var treeview = new template.components.Treeview({
 		target: div,
-		parent: component
+		_root: component._root || component,
+		data: treeview_initialData
 	});
-	
-	target.appendChild( div )
 
 	return {
-		update: function ( changed, root ) {
-			text.data = root.title;
+		mount: function ( target, anchor ) {
+			insertNode( div, target, anchor );
 		},
-
+		
+		update: function ( changed, root ) {
+			var __tmp;
+		
+			if ( ( __tmp = root.title ) !== last_text ) {
+				text.data = last_text = __tmp;
+			}
+			
+			var treeview_changes = {};
+			
+			if ( 'locations' in changed ) treeview_changes.locations = root.locations;
+			
+			if ( Object.keys( treeview_changes ).length ) treeview.set( treeview_changes );
+		},
+		
 		teardown: function ( detach ) {
-			if ( detach ) div.parentNode.removeChild( div );
+			grid.destroy( false );
+			treeview.destroy( false );
 			
-			
-			
-			text1.parentNode.removeChild( text1 );
-			
-			
-			
-			text2.parentNode.removeChild( text2 );
-			
-			text3.parentNode.removeChild( text3 );
-			
-			grid.teardown( false );
-			
-			text4.parentNode.removeChild( text4 );
-			
-			
-			
-			text5.parentNode.removeChild( text5 );
-			
-			text6.parentNode.removeChild( text6 );
-			
-			treeview.teardown( false );
+			if ( detach ) {
+				detachNode( div );
+			}
 		}
 	};
 }
 
-function app ( options ) {
-	var component = this;
-	var state = Object.assign( template.data(), options.data );
-
-	var observers = {
-		immediate: Object.create( null ),
-		deferred: Object.create( null )
+function App ( options ) {
+	options = options || {};
+	this._state = Object.assign( template.data(), options.data );
+	
+	this._observers = {
+		pre: Object.create( null ),
+		post: Object.create( null )
 	};
+	
+	this._handlers = Object.create( null );
+	
+	this._root = options._root;
+	this._yield = options._yield;
+	
+	this._torndown = false;
+	this._renderHooks = [];
+	
+	this._fragment = renderMainFragment( this._state, this );
+	if ( options.target ) this._fragment.mount( options.target, null );
+	
+	this._flush();
+}
 
-	var callbacks = Object.create( null );
+App.prototype.get = function get( key ) {
+ 	return key ? this._state[ key ] : this._state;
+ };
 
-	function dispatchObservers ( group, newState, oldState ) {
-		for ( const key in group ) {
-			if ( !( key in newState ) ) continue;
+App.prototype.fire = function fire( eventName, data ) {
+ 	var handlers = eventName in this._handlers && this._handlers[ eventName ].slice();
+ 	if ( !handlers ) return;
+ 
+ 	for ( var i = 0; i < handlers.length; i += 1 ) {
+ 		handlers[i].call( this, data );
+ 	}
+ };
 
-			const newValue = newState[ key ];
-			const oldValue = oldState[ key ];
+App.prototype.observe = function observe( key, callback, options ) {
+ 	var group = ( options && options.defer ) ? this._observers.pre : this._observers.post;
+ 
+ 	( group[ key ] || ( group[ key ] = [] ) ).push( callback );
+ 
+ 	if ( !options || options.init !== false ) {
+ 		callback.__calling = true;
+ 		callback.call( this, this._state[ key ] );
+ 		callback.__calling = false;
+ 	}
+ 
+ 	return {
+ 		cancel: function () {
+ 			var index = group[ key ].indexOf( callback );
+ 			if ( ~index ) group[ key ].splice( index, 1 );
+ 		}
+ 	};
+ };
 
-			if ( newValue === oldValue && typeof newValue !== 'object' ) continue;
+App.prototype.on = function on( eventName, handler ) {
+ 	var handlers = this._handlers[ eventName ] || ( this._handlers[ eventName ] = [] );
+ 	handlers.push( handler );
+ 
+ 	return {
+ 		cancel: function () {
+ 			var index = handlers.indexOf( handler );
+ 			if ( ~index ) handlers.splice( index, 1 );
+ 		}
+ 	};
+ };
 
-			const callbacks = group[ key ];
-			if ( !callbacks ) continue;
+App.prototype.set = function set( newState ) {
+ 	this._set( newState );
+ 	( this._root || this )._flush();
+ };
 
-			for ( let i = 0; i < callbacks.length; i += 1 ) {
-				const callback = callbacks[i];
-				if ( callback.__calling ) continue;
+App.prototype._flush = function _flush() {
+ 	if ( !this._renderHooks ) return;
+ 
+ 	while ( this._renderHooks.length ) {
+ 		var hook = this._renderHooks.pop();
+ 		hook.fn.call( hook.context );
+ 	}
+ };
 
-				callback.__calling = true;
-				callback.call( component, newValue, oldValue );
-				callback.__calling = false;
-			}
-		}
-	}
+App.prototype._set = function _set ( newState ) {
+	var oldState = this._state;
+	this._state = Object.assign( {}, oldState, newState );
+	
+	dispatchObservers( this, this._observers.pre, newState, oldState );
+	if ( this._fragment ) this._fragment.update( newState, this._state );
+	dispatchObservers( this, this._observers.post, newState, oldState );
+	
+	this._flush();
+};
 
-	this.fire = function fire ( eventName, data ) {
-		var handlers = eventName in callbacks && callbacks[ eventName ].slice();
-		if ( !handlers ) return;
+App.prototype.teardown = App.prototype.destroy = function destroy ( detach ) {
+	this.fire( 'teardown' );
 
-		for ( var i = 0; i < handlers.length; i += 1 ) {
-			handlers[i].call( this, data );
-		}
-	};
+	this._fragment.teardown( detach !== false );
+	this._fragment = null;
 
-	this.get = function get ( key ) {
-		return state[ key ];
-	};
+	this._state = {};
+	this._torndown = true;
+};
 
-	this.set = function set ( newState ) {
-		const oldState = state;
-		state = Object.assign( {}, oldState, newState );
-		
-		dispatchObservers( observers.immediate, newState, oldState );
-		if ( mainFragment ) mainFragment.update( newState, state );
-		dispatchObservers( observers.deferred, newState, oldState );
-		
-		while ( this.__renderHooks.length ) {
-			var hook = this.__renderHooks.pop();
-			hook.fn.call( hook.context );
-		}
-	};
+var dispatchObservers = function dispatchObservers( component, group, newState, oldState ) {
+	for ( var key in group ) {
+		if ( !( key in newState ) ) continue;
 
-	this.observe = function ( key, callback, options = {} ) {
-		const group = options.defer ? observers.deferred : observers.immediate;
+		var newValue = newState[ key ];
+		var oldValue = oldState[ key ];
 
-		( group[ key ] || ( group[ key ] = [] ) ).push( callback );
+		if ( newValue === oldValue && typeof newValue !== 'object' ) continue;
 
-		if ( options.init !== false ) {
+		var callbacks = group[ key ];
+		if ( !callbacks ) continue;
+
+		for ( var i = 0; i < callbacks.length; i += 1 ) {
+			var callback = callbacks[i];
+			if ( callback.__calling ) continue;
+
 			callback.__calling = true;
-			callback.call( component, state[ key ] );
+			callback.call( component, newValue, oldValue );
 			callback.__calling = false;
 		}
-
-		return {
-			cancel () {
-				const index = group[ key ].indexOf( callback );
-				if ( ~index ) group[ key ].splice( index, 1 );
-			}
-		};
-	};
-
-	this.on = function on ( eventName, handler ) {
-		const handlers = callbacks[ eventName ] || ( callbacks[ eventName ] = [] );
-		handlers.push( handler );
-
-		return {
-			cancel: function () {
-				const index = handlers.indexOf( handler );
-				if ( ~index ) handlers.splice( index, 1 );
-			}
-		};
-	};
-
-	this.teardown = function teardown ( detach ) {
-		this.fire( 'teardown' );
-
-		mainFragment.teardown( detach !== false );
-		mainFragment = null;
-
-		state = {};
-	};
-
-	this.__renderHooks = [];
-	
-	var mainFragment = renderMainFragment( state, this, options.target );
-	
-	while ( this.__renderHooks.length ) {
-		var hook = this.__renderHooks.pop();
-		hook.fn.call( hook.context );
 	}
 }
 
-export default app;
+function createElement( name ) {
+	return document.createElement( name );
+}
+
+function detachNode( node ) {
+	node.parentNode.removeChild( node );
+}
+
+function insertNode( node, target, anchor ) {
+	target.insertBefore( node, anchor );
+}
+
+function appendNode( node, target ) {
+	target.appendChild( node );
+}
+
+function createText( data ) {
+	return document.createTextNode( data );
+}
+
+function dispatchObservers( component, group, newState, oldState ) {
+	for ( var key in group ) {
+		if ( !( key in newState ) ) continue;
+
+		var newValue = newState[ key ];
+		var oldValue = oldState[ key ];
+
+		if ( newValue === oldValue && typeof newValue !== 'object' ) continue;
+
+		var callbacks = group[ key ];
+		if ( !callbacks ) continue;
+
+		for ( var i = 0; i < callbacks.length; i += 1 ) {
+			var callback = callbacks[i];
+			if ( callback.__calling ) continue;
+
+			callback.__calling = true;
+			callback.call( component, newValue, oldValue );
+			callback.__calling = false;
+		}
+	}
+}
+
+export default App;

@@ -2,26 +2,31 @@
   <h1>{{title}}</h1>
 
   <h4>Grid</h4>
-   <grid></grid>
+   <Grid></Grid>
 
   <h4>Treeview</h4>
-  <treeview></treeview>
+  <Treeview locations='{{locations}}'></Treeview>
 </div>
 
 <script>
-  import treeview from './treeview/treeview';
-  import grid from './grid/grid';
-  
+  import Treeview from './treeview/treeview';
+  import Grid from './grid/grid';
+  import { LocationService } from './treeview/location-service';
+ 
+  let locationService = new LocationService();
+  let locations = locationService.getLocations();
+
   export default {
     data () {
       return {
-        title: 'Svelte Demo Components'
+        title: 'Svelte Demo Components',
+        locations: locations
       }
     },
 
     components: {
-      treeview: treeview,
-      grid: grid
+      Treeview,
+      Grid
     }
   }; 
 
