@@ -10,7 +10,16 @@ export default {
       languageIn: 'ECMASCRIPT6',
       languageOut: 'ECMASCRIPT5',
       compilationLevel: 'ADVANCED',
-      warningLevel: 'DEFAULT'
+      warningLevel: 'DEFAULT',
+      externs: [{src: `const fn = function(a){};
+                       fn.centroid = function(a){};
+                       
+                       const options = {};
+                       options.innerRadius;
+                       options.outerRadius;
+                       options.startAngle;
+                       options.endAngle;          
+              `}]
     })
   ]
 }

@@ -1,23 +1,15 @@
-import Treeview from './treeview/treeview';
-import Grid from './grid/grid';
-import { LocationService } from './treeview/location-service';
+import Graph from './graph/graph';
 
 var template = (function () {
- 
-  let locationService = new LocationService();
-  let locations = locationService.getLocations();
-
   return {
     data () {
       return {
-        title: 'Svelte Demo Components',
-        locations: locations
+        title: 'Svelte Demo Components'
       }
     },
 
     components: {
-      Treeview,
-      Grid
+      Graph
     }
   }; 
 
@@ -32,34 +24,17 @@ function renderMainFragment ( root, component ) {
 	var last_text = root.title
 	var text = createText( last_text );
 	appendNode( text, h1 );
-	appendNode( createText( "\n\n  " ), div );
+	appendNode( createText( "\n  " ), div );
 	
 	var h4 = createElement( 'h4' );
 	
 	appendNode( h4, div );
-	appendNode( createText( "Grid" ), h4 );
-	appendNode( createText( "\n   " ), div );
-	
-	var grid = new template.components.Grid({
-		target: div,
-		_root: component._root || component
-	});
-	
-	appendNode( createText( "\n\n  " ), div );
-	
-	var h41 = createElement( 'h4' );
-	
-	appendNode( h41, div );
-	appendNode( createText( "Treeview" ), h41 );
+	appendNode( createText( "Graph" ), h4 );
 	appendNode( createText( "\n  " ), div );
 	
-	var treeview_initialData = {
-		locations: root.locations
-	};
-	var treeview = new template.components.Treeview({
+	var graph = new template.components.Graph({
 		target: div,
-		_root: component._root || component,
-		data: treeview_initialData
+		_root: component._root || component
 	});
 
 	return {
@@ -73,17 +48,10 @@ function renderMainFragment ( root, component ) {
 			if ( ( __tmp = root.title ) !== last_text ) {
 				text.data = last_text = __tmp;
 			}
-			
-			var treeview_changes = {};
-			
-			if ( 'locations' in changed ) treeview_changes.locations = root.locations;
-			
-			if ( Object.keys( treeview_changes ).length ) treeview.set( treeview_changes );
 		},
 		
 		teardown: function ( detach ) {
-			grid.destroy( false );
-			treeview.destroy( false );
+			graph.destroy( false );
 			
 			if ( detach ) {
 				detachNode( div );

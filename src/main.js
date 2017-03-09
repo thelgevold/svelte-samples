@@ -1,5 +1,5 @@
-import App from './app';
+import Graph from './graph/graph';
 
-var demoApp = new App({
+var demoApp = new Graph({
   target: document.querySelector( 'main' )
 });

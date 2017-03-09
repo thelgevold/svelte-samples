@@ -1,11 +1,11 @@
 export class Location {
   constructor(name, locations, visible) {
     this.name = name;
-    this.locations = locations.map(l => new Location(l, [], false));
+    //this.locations = locations.map(l => new Location(l, [], false));
   }
 
   addLocation(name) {
-    let newLocation = new Location(name, [], false);
+    //let newLocation = new Location(name, [], false);
     this.locations.push(newLocation);
     return newLocation;
   }

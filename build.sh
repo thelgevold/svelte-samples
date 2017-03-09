@@ -1,3 +1,2 @@
-svelte compile -i src/treeview/Treeview.html -o src/treeview/treeview.js
-svelte compile -i src/grid/Grid.html -o src/grid/grid.js
+svelte compile -i src/graph/Graph.html -o src/graph/graph.js
 svelte compile -i src/App.html -o src/app.js
