@@ -1,104 +1,133 @@
+import Details from './details';
+
 var template = (function () {
- return { 
-};
+
+  return {
+    oncreate() {
+      this.set({fullName: this._state.firstName + ' Smith'});
+
+      this.refs.details.observe('age', (newAge, oldAge) => {
+        this.set({personAge:newAge || 0});
+      });
+    },
+
+    data () {
+      return {
+        firstName: 'Joe'
+      }  
+    },
+
+
+    components: {Details}
+    
+  };
 }());
 
 function renderMainFragment ( root, component ) {
-	var ul = createElement( 'ul' );
+	var div = createElement( 'div' );
 	
-	var eachBlock_anchor = createComment();
-	appendNode( eachBlock_anchor, ul );
-	var eachBlock_value = root.locations;
-	var eachBlock_iterations = [];
+	var last_text = root.firstName
+	var text = createText( last_text );
+	appendNode( text, div );
+	var text1 = createText( "\n\n" );
+	var ifBlock_anchor = createComment();
 	
-	for ( var i = 0; i < eachBlock_value.length; i += 1 ) {
-		eachBlock_iterations[i] = renderEachBlock( root, eachBlock_value, eachBlock_value[i], i, component );
-		eachBlock_iterations[i].mount( eachBlock_anchor.parentNode, eachBlock_anchor );
+	function getBlock ( root ) {
+		if ( root.fullName ) return renderIfBlock_0;
+		return null;
 	}
+	
+	var currentBlock = getBlock( root );
+	var ifBlock = currentBlock && currentBlock( root, component );
+	
+	var text2 = createText( "\n" );
+	var last_text3 = root.personAge
+	var text3 = createText( last_text3 );
 
 	return {
 		mount: function ( target, anchor ) {
-			insertNode( ul, target, anchor );
+			insertNode( div, target, anchor );
+			insertNode( text1, target, anchor );
+			insertNode( ifBlock_anchor, target, anchor );
+			if ( ifBlock ) ifBlock.mount( ifBlock_anchor.parentNode, ifBlock_anchor );
+			insertNode( text2, target, anchor );
+			insertNode( text3, target, anchor );
 		},
 		
 		update: function ( changed, root ) {
 			var __tmp;
 		
-			var eachBlock_value = root.locations;
-			
-			for ( var i = 0; i < eachBlock_value.length; i += 1 ) {
-				if ( !eachBlock_iterations[i] ) {
-					eachBlock_iterations[i] = renderEachBlock( root, eachBlock_value, eachBlock_value[i], i, component );
-					eachBlock_iterations[i].mount( eachBlock_anchor.parentNode, eachBlock_anchor );
-				} else {
-					eachBlock_iterations[i].update( changed, root, eachBlock_value, eachBlock_value[i], i );
-				}
-			}
-			
-			teardownEach( eachBlock_iterations, true, eachBlock_value.length );
-			
-			eachBlock_iterations.length = eachBlock_value.length;
-		},
-		
-		teardown: function ( detach ) {
-			teardownEach( eachBlock_iterations, false );
-			
-			if ( detach ) {
-				detachNode( ul );
-			}
-		}
-	};
-}
-
-function renderEachBlock ( root, eachBlock_value, loc, loc__index, component ) {
-	var li = createElement( 'li' );
-	
-	var last_text = loc.name
-	var text = createText( last_text );
-	appendNode( text, li );
-	appendNode( createText( "\n      " ), li );
-	
-	var treeview_initialData = {
-		locations: loc.locations
-	};
-	var treeview = new Treeview({
-		target: li,
-		_root: component._root || component,
-		data: treeview_initialData
-	});
-
-	return {
-		mount: function ( target, anchor ) {
-			insertNode( li, target, anchor );
-		},
-		
-		update: function ( changed, root, eachBlock_value, loc, loc__index ) {
-			var __tmp;
-		
-			if ( ( __tmp = loc.name ) !== last_text ) {
+			if ( ( __tmp = root.firstName ) !== last_text ) {
 				text.data = last_text = __tmp;
 			}
 			
-			var treeview_changes = {};
+			var _currentBlock = currentBlock;
+			currentBlock = getBlock( root );
+			if ( _currentBlock === currentBlock && ifBlock) {
+				ifBlock.update( changed, root );
+			} else {
+				if ( ifBlock ) ifBlock.teardown( true );
+				ifBlock = currentBlock && currentBlock( root, component );
+				if ( ifBlock ) ifBlock.mount( ifBlock_anchor.parentNode, ifBlock_anchor );
+			}
 			
-			if ( 'locations' in changed ) treeview_changes.locations = loc.locations;
-			
-			if ( Object.keys( treeview_changes ).length ) treeview.set( treeview_changes );
+			if ( ( __tmp = root.personAge ) !== last_text3 ) {
+				text3.data = last_text3 = __tmp;
+			}
 		},
 		
 		teardown: function ( detach ) {
-			treeview.destroy( false );
+			if ( ifBlock ) ifBlock.teardown( detach );
 			
 			if ( detach ) {
-				detachNode( li );
+				detachNode( div );
+				detachNode( text1 );
+				detachNode( ifBlock_anchor );
+				detachNode( text2 );
+				detachNode( text3 );
 			}
 		}
 	};
 }
 
-function Treeview ( options ) {
+function renderIfBlock_0 ( root, component ) {
+	var details_initialData = {
+		name: root.fullName
+	};
+	var details = new template.components.Details({
+		target: null,
+		_root: component._root || component,
+		data: details_initialData
+	});
+	
+	component.refs.details = details;
+
+	return {
+		mount: function ( target, anchor ) {
+			details._fragment.mount( target, anchor );
+		},
+		
+		update: function ( changed, root ) {
+			var __tmp;
+		
+			var details_changes = {};
+			
+			if ( 'fullName' in changed ) details_changes.name = root.fullName;
+			
+			if ( Object.keys( details_changes ).length ) details.set( details_changes );
+		},
+		
+		teardown: function ( detach ) {
+			if ( component.refs.details === details ) component.refs.details = null;
+			details.destroy( detach );
+		}
+	};
+}
+
+function Person ( options ) {
 	options = options || {};
-	this._state = options.data || {};
+	this.refs = {};
+	this._state = Object.assign( template.data(), options.data );
 	
 	this._observers = {
 		pre: Object.create( null ),
@@ -117,13 +146,19 @@ function Treeview ( options ) {
 	if ( options.target ) this._fragment.mount( options.target, null );
 	
 	this._flush();
+	
+	if ( options._root ) {
+		options._root._renderHooks.push({ fn: template.oncreate, context: this });
+	} else {
+		template.oncreate.call( this );
+	}
 }
 
-Treeview.prototype.get = function get( key ) {
+Person.prototype.get = function get( key ) {
  	return key ? this._state[ key ] : this._state;
  };
 
-Treeview.prototype.fire = function fire( eventName, data ) {
+Person.prototype.fire = function fire( eventName, data ) {
  	var handlers = eventName in this._handlers && this._handlers[ eventName ].slice();
  	if ( !handlers ) return;
  
@@ -132,7 +167,7 @@ Treeview.prototype.fire = function fire( eventName, data ) {
  	}
  };
 
-Treeview.prototype.observe = function observe( key, callback, options ) {
+Person.prototype.observe = function observe( key, callback, options ) {
  	var group = ( options && options.defer ) ? this._observers.pre : this._observers.post;
  
  	( group[ key ] || ( group[ key ] = [] ) ).push( callback );
@@ -151,7 +186,7 @@ Treeview.prototype.observe = function observe( key, callback, options ) {
  	};
  };
 
-Treeview.prototype.on = function on( eventName, handler ) {
+Person.prototype.on = function on( eventName, handler ) {
  	var handlers = this._handlers[ eventName ] || ( this._handlers[ eventName ] = [] );
  	handlers.push( handler );
  
@@ -163,12 +198,12 @@ Treeview.prototype.on = function on( eventName, handler ) {
  	};
  };
 
-Treeview.prototype.set = function set( newState ) {
+Person.prototype.set = function set( newState ) {
  	this._set( newState );
  	( this._root || this )._flush();
  };
 
-Treeview.prototype._flush = function _flush() {
+Person.prototype._flush = function _flush() {
  	if ( !this._renderHooks ) return;
  
  	while ( this._renderHooks.length ) {
@@ -177,7 +212,7 @@ Treeview.prototype._flush = function _flush() {
  	}
  };
 
-Treeview.prototype._set = function _set ( newState ) {
+Person.prototype._set = function _set ( newState ) {
 	var oldState = this._state;
 	this._state = Object.assign( {}, oldState, newState );
 	
@@ -188,7 +223,7 @@ Treeview.prototype._set = function _set ( newState ) {
 	this._flush();
 };
 
-Treeview.prototype.teardown = Treeview.prototype.destroy = function destroy ( detach ) {
+Person.prototype.teardown = Person.prototype.destroy = function destroy ( detach ) {
 	this.fire( 'teardown' );
 
 	this._fragment.teardown( detach !== false );
@@ -233,22 +268,16 @@ function insertNode( node, target, anchor ) {
 	target.insertBefore( node, anchor );
 }
 
-function createComment() {
-	return document.createComment( '' );
+function createText( data ) {
+	return document.createTextNode( data );
 }
 
 function appendNode( node, target ) {
 	target.appendChild( node );
 }
 
-function teardownEach( iterations, detach, start ) {
-	for ( var i = ( start || 0 ); i < iterations.length; i += 1 ) {
-		iterations[i].teardown( detach );
-	}
-}
-
-function createText( data ) {
-	return document.createTextNode( data );
+function createComment() {
+	return document.createComment( '' );
 }
 
 function dispatchObservers( component, group, newState, oldState ) {
@@ -274,4 +303,4 @@ function dispatchObservers( component, group, newState, oldState ) {
 	}
 }
 
-export default Treeview;
+export default Person;

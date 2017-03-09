@@ -1,0 +1,17 @@
+<div>{{name}}</div>
+
+<button on:click="increase()">Increase Age</button>
+<script>
+  export default {
+  
+    methods: {
+      increase: function ( ) {
+        let current = this._state['age'] || 0;
+        let newAge = current + 1;
+        console.log(newAge);
+        this.set({'age': newAge});
+      }
+    },
+
+  };
+</script>

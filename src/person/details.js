@@ -1,68 +1,66 @@
-import Graph from './graph/graph';
-
 var template = (function () {
   return {
-    data () {
-      return {
-        title: 'Svelte Demo Components'
+  
+    methods: {
+      increase: function ( ) {
+        let current = this._state['age'] || 0;
+        let newAge = current + 1;
+        console.log(newAge);
+        this.set({'age': newAge});
       }
     },
 
-    components: {
-      Graph
-    }
-  }; 
-
+  };
 }());
 
 function renderMainFragment ( root, component ) {
 	var div = createElement( 'div' );
 	
-	var h1 = createElement( 'h1' );
-	
-	appendNode( h1, div );
-	var last_text = root.title
+	var last_text = root.name
 	var text = createText( last_text );
-	appendNode( text, h1 );
-	appendNode( createText( "\n  " ), div );
+	appendNode( text, div );
+	var text1 = createText( "\n\n" );
 	
-	var h4 = createElement( 'h4' );
+	var button = createElement( 'button' );
 	
-	appendNode( h4, div );
-	appendNode( createText( "Graph" ), h4 );
-	appendNode( createText( "\n  " ), div );
+	function clickHandler ( event ) {
+		component.increase();
+	}
 	
-	var graph = new template.components.Graph({
-		target: div,
-		_root: component._root || component
-	});
+	addEventListener( button, 'click', clickHandler );
+	
+	appendNode( createText( "Increase Age" ), button );
 
 	return {
 		mount: function ( target, anchor ) {
 			insertNode( div, target, anchor );
+			insertNode( text1, target, anchor );
+			insertNode( button, target, anchor );
 		},
 		
 		update: function ( changed, root ) {
 			var __tmp;
 		
-			if ( ( __tmp = root.title ) !== last_text ) {
+			if ( ( __tmp = root.name ) !== last_text ) {
 				text.data = last_text = __tmp;
 			}
 		},
 		
 		teardown: function ( detach ) {
-			graph.destroy( false );
+			removeEventListener( button, 'click', clickHandler );
 			
 			if ( detach ) {
 				detachNode( div );
+				detachNode( text1 );
+				detachNode( button );
 			}
 		}
 	};
 }
 
-function App ( options ) {
+function Details ( options ) {
 	options = options || {};
-	this._state = Object.assign( template.data(), options.data );
+	this._state = options.data || {};
 	
 	this._observers = {
 		pre: Object.create( null ),
@@ -75,19 +73,18 @@ function App ( options ) {
 	this._yield = options._yield;
 	
 	this._torndown = false;
-	this._renderHooks = [];
 	
 	this._fragment = renderMainFragment( this._state, this );
 	if ( options.target ) this._fragment.mount( options.target, null );
-	
-	this._flush();
 }
 
-App.prototype.get = function get( key ) {
+Details.prototype = template.methods;
+
+Details.prototype.get = function get( key ) {
  	return key ? this._state[ key ] : this._state;
  };
 
-App.prototype.fire = function fire( eventName, data ) {
+Details.prototype.fire = function fire( eventName, data ) {
  	var handlers = eventName in this._handlers && this._handlers[ eventName ].slice();
  	if ( !handlers ) return;
  
@@ -96,7 +93,7 @@ App.prototype.fire = function fire( eventName, data ) {
  	}
  };
 
-App.prototype.observe = function observe( key, callback, options ) {
+Details.prototype.observe = function observe( key, callback, options ) {
  	var group = ( options && options.defer ) ? this._observers.pre : this._observers.post;
  
  	( group[ key ] || ( group[ key ] = [] ) ).push( callback );
@@ -115,7 +112,7 @@ App.prototype.observe = function observe( key, callback, options ) {
  	};
  };
 
-App.prototype.on = function on( eventName, handler ) {
+Details.prototype.on = function on( eventName, handler ) {
  	var handlers = this._handlers[ eventName ] || ( this._handlers[ eventName ] = [] );
  	handlers.push( handler );
  
@@ -127,12 +124,12 @@ App.prototype.on = function on( eventName, handler ) {
  	};
  };
 
-App.prototype.set = function set( newState ) {
+Details.prototype.set = function set( newState ) {
  	this._set( newState );
  	( this._root || this )._flush();
  };
 
-App.prototype._flush = function _flush() {
+Details.prototype._flush = function _flush() {
  	if ( !this._renderHooks ) return;
  
  	while ( this._renderHooks.length ) {
@@ -141,18 +138,16 @@ App.prototype._flush = function _flush() {
  	}
  };
 
-App.prototype._set = function _set ( newState ) {
+Details.prototype._set = function _set ( newState ) {
 	var oldState = this._state;
 	this._state = Object.assign( {}, oldState, newState );
 	
 	dispatchObservers( this, this._observers.pre, newState, oldState );
 	if ( this._fragment ) this._fragment.update( newState, this._state );
 	dispatchObservers( this, this._observers.post, newState, oldState );
-	
-	this._flush();
 };
 
-App.prototype.teardown = App.prototype.destroy = function destroy ( detach ) {
+Details.prototype.teardown = Details.prototype.destroy = function destroy ( detach ) {
 	this.fire( 'teardown' );
 
 	this._fragment.teardown( detach !== false );
@@ -197,12 +192,20 @@ function insertNode( node, target, anchor ) {
 	target.insertBefore( node, anchor );
 }
 
+function createText( data ) {
+	return document.createTextNode( data );
+}
+
 function appendNode( node, target ) {
 	target.appendChild( node );
 }
 
-function createText( data ) {
-	return document.createTextNode( data );
+function addEventListener( node, event, handler ) {
+	node.addEventListener ( event, handler, false );
+}
+
+function removeEventListener( node, event, handler ) {
+	node.removeEventListener ( event, handler, false );
 }
 
 function dispatchObservers( component, group, newState, oldState ) {
@@ -228,4 +231,4 @@ function dispatchObservers( component, group, newState, oldState ) {
 	}
 }
 
-export default App;
+export default Details;

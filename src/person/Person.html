@@ -1,0 +1,30 @@
+<div>{{firstName}}</div>
+
+{{#if fullName}}
+  <Details name={{fullName}} ref:details></Details>
+{{/if}}
+{{personAge}}
+<script>
+
+  import Details from './details';
+
+  export default {
+    oncreate() {
+      this.set({fullName: this._state.firstName + ' Smith'});
+
+      this.refs.details.observe('age', (newAge, oldAge) => {
+        this.set({personAge:newAge || 0});
+      });
+    },
+
+    data () {
+      return {
+        firstName: 'Joe'
+      }  
+    },
+
+
+    components: {Details}
+    
+  };
+</script>
